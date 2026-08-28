@@ -357,8 +357,6 @@ function warningCard(){
 }
 
 function play(b){
-  const followRisk = nearBottom(risk);
-  const followChat = nearBottom(chat);
   switch(b.t){
     case 'user': addUser(b.html); break;
     case 'agent': {
@@ -369,7 +367,7 @@ function play(b){
         b.steps.forEach((s,i)=>{
           const line = el(`<div class="st"><span class="ck">✓</span>${s}</div>`);
           box.appendChild(line);
-          setTimeout(()=>{ line.classList.add('show'); if(nearBottom(chat)) chat.scrollTop = chat.scrollHeight; }, 700 + i*750);
+          setTimeout(()=>{ line.classList.add('show'); }, 700 + i*750);
         });
       }
       break;
@@ -382,8 +380,6 @@ function play(b){
     case 'card': warningCard(); break;
     case 'outcome': setTimeout(()=>cmd.focus(), 600); break;
   }
-  if(followRisk) risk.scrollTop = risk.scrollHeight;
-  if(followChat) chat.scrollTop = chat.scrollHeight;
 }
 
 function advance(){
