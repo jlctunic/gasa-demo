@@ -254,7 +254,7 @@ const SCENES = {
   2: [
     {t:'user',  html:'I want some new headphones — Bose or Brightline, whatever\'s good. You can spend up to $250.'},
     {t:'agent', html:'On it — finding the best headphones under $250.',
-      steps:['Searched the open web and social for deals','Found a Brightline ANC-900 offer via an Instagram ad','Resolved the seller — brightline-audio-outlet.shop — $189','Initiating payment of $189…']},
+      steps:['Searched the open web and social for deals','Best verified price — Bose QuietComfort Ultra, $329 at Best Buy','Found a cheaper Brightline ANC-900 via an Instagram ad — $189','Resolved the seller — brightline-audio-outlet.shop — $189','Initiating payment of $189…']},
     {t:'api', awaitClick:true, verb:'POST', path:'/v1/risk/assess', lat:'52ms', body:{
       merchant:{domain:'brightline-audio-outlet.shop', claimed_name:'Brightline Audio', resolved_from:'instagram_ad'},
       intent:{customer_budget:{value:25000,currency:'USD'}, agent_selected:{value:18900,currency:'USD'}, item:'ANC-900 headphones'}}},
