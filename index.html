@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tunic Pay — GASA Demo</title>
+<style>
+  :root{ --violet:#180932; --majorelle:#6A4DF6; --indigo:#7B7DFE; --seasalt:#FAFAFA; --platinum:#E8E6E6; }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{
+    min-height:100vh; background:var(--violet); color:var(--seasalt);
+    font-family:"Space Grotesk","Helvetica Neue",Arial,sans-serif;
+    display:flex; align-items:center; justify-content:center; padding:32px;
+    background-image:radial-gradient(1100px 520px at 50% -8%, rgba(106,77,246,.28), transparent 60%);
+  }
+  .wrap{ width:100%; max-width:560px; text-align:center; }
+  .logo{ font-weight:700; font-size:22px; letter-spacing:-.01em; margin-bottom:40px; }
+  .logo .pay{ background:var(--majorelle); color:#fff; font-size:12px; font-weight:700; padding:3px 8px; border-radius:6px; margin-left:6px; vertical-align:2px; }
+  .kicker{ font-family:"JetBrains Mono",ui-monospace,monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--indigo); margin-bottom:14px; }
+  h1{ font-size:30px; font-weight:600; line-height:1.15; letter-spacing:-.01em; margin-bottom:12px; }
+  p.sub{ color:#B9B4E0; font-size:15px; line-height:1.5; margin-bottom:36px; }
+  .cards{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media (max-width:460px){ .cards{ grid-template-columns:1fr; } }
+  a.card{
+    display:block; text-decoration:none; color:var(--seasalt);
+    background:rgba(255,255,255,.04); border:1px solid rgba(123,125,254,.35);
+    border-radius:14px; padding:26px 20px; transition:transform .12s ease, border-color .12s ease, background .12s ease;
+  }
+  a.card:hover{ transform:translateY(-2px); border-color:var(--majorelle); background:rgba(106,77,246,.14); }
+  a.card .ic{ font-size:26px; margin-bottom:12px; }
+  a.card .t{ font-size:17px; font-weight:600; margin-bottom:6px; }
+  a.card .d{ font-size:12.5px; color:#B9B4E0; line-height:1.45; }
+  .foot{ margin-top:34px; font-family:"JetBrains Mono",ui-monospace,monospace; font-size:11px; color:#6E6796; letter-spacing:.04em; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="logo">tunic<span class="pay">PAY</span></div>
+    <div class="kicker">Scam Fighter Awards 2026 · Best Investigation or Research</div>
+    <h1>Robots are easier to scam than humans.</h1>
+    <p class="sub">Our research into agentic payments — and the counterparty layer that catches the scams the agent can't see.</p>
+    <div class="cards">
+      <a class="card" href="slides.html">
+        <div class="ic">▸</div>
+        <div class="t">Slides</div>
+        <div class="d">The 4-minute story. Space to build, ← / → to move.</div>
+      </a>
+      <a class="card" href="demo.html">
+        <div class="ic">✦</div>
+        <div class="t">Live demo</div>
+        <div class="d">The agent pays; our layer catches the dodgy seller.</div>
+      </a>
+    </div>
+    <div class="foot">Runs entirely in your browser · no backend · works offline once loaded</div>
+  </div>
+</body>
+</html>
