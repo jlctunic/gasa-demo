@@ -451,6 +451,8 @@ function scheduleNext(justPlayed){
 function resume(){ const beats = SCENES[scene]; if(beat < beats.length && beats[beat].awaitClick){ advance(); } }
 
 function runCommand(text){
+  // tidy dictated/pasted input: drop leading colons + surrounding quote marks
+  text = text.trim().replace(/^[\s:;"“”'']+/, '').replace(/[\s"“”'']+$/, '');
   // mid-scene: if the script is waiting on the customer's choice, this input IS that choice
   const pending = SCENES[scene][beat];
   if(pending && pending.await){
