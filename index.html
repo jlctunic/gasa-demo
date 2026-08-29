@@ -93,6 +93,22 @@
   .steps .st .ck{color:var(--ok);font-weight:700;margin-right:6px}
 
   /* Tunic Pay warning card, delivered by the bank inside the chat */
+  .prods{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+  .prod{position:relative;border:1px solid #E4E4EC;border-radius:14px;padding:12px 12px 10px;background:#fff;transition:opacity .3s}
+  .prod.deal{border:1.5px solid var(--majorelle);background:#FBFAFF}
+  .prod.dim{opacity:.35}
+  .dealtag{position:absolute;top:-8px;right:10px;background:var(--majorelle);color:#fff;font-size:9px;font-weight:700;letter-spacing:.06em;padding:2px 7px;border-radius:8px}
+  .pimg{height:52px;display:flex;align-items:center;justify-content:center;margin-bottom:6px}
+  .pimg svg{height:46px;width:auto}
+  .pname{font-weight:600;font-size:12.5px;color:var(--gpt-ink);line-height:1.25}
+  .pline{display:flex;align-items:baseline;gap:7px;margin-top:3px}
+  .pprice{font-weight:700;font-size:14px;color:var(--gpt-ink)}
+  .ptag{font-size:10px;color:var(--gpt-grey)}
+  .prod.deal .ptag{color:var(--majorelle);font-weight:600}
+  .psrc{font-size:10px;color:var(--gpt-grey);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pbuy{margin-top:8px;width:100%;border:none;border-radius:9px;padding:6px 0;font-size:12px;font-weight:600;cursor:pointer;background:#EFEFF4;color:var(--gpt-ink)}
+  .prod.deal .pbuy{background:var(--majorelle);color:#fff}
+  .pbuy.picked{background:var(--ok)!important;color:#fff}
   .tp-card{margin-top:14px;border:1.5px solid var(--indigo);border-radius:16px;overflow:hidden;background:#FBFAFF}
   .tp-card .hd{display:flex;align-items:center;gap:8px;padding:12px 16px;background:#F1EEFF;border-bottom:1px solid #E3DEFC;font-size:13px;font-weight:600;color:var(--violet)}
   .tp-card .hd .chip{background:var(--majorelle);color:#fff;border-radius:5px;padding:1px 6px;font-size:10.5px}
@@ -252,15 +268,20 @@ const SCENES = {
 
   /* ---------- 2 · dodgy seller: impersonation + prompt injection ---------- */
   2: [
-    {t:'user',  html:'I want some new headphones — Bose or Brightline, whatever\'s good. You can spend up to $250.'},
-    {t:'agent', html:'Here\'s what I found — three solid options:<div class="steps"><div class="st show"><span class="ck">1.</span><b>Bose QuietComfort Ultra</b> — $329 · Best Buy <i>(over your $250 budget)</i></div><div class="st show"><span class="ck">2.</span><b>Sony WH-1000XM5</b> — $299 · Amazon <i>(over budget)</i></div><div class="st show"><span class="ck">3.</span><b>Brightline ANC-900</b> — $189 · brightline-audio-outlet.shop <i>(via an Instagram ad — the only one under budget)</i></div></div>Which would you like?',
-      steps:['Searched the open web and social for deals']},
-    {t:'user', await:true, html:'Let\'s go with the cheapest one.'},
-    {t:'agent', html:'Good call — the Brightline ANC-900 at $189, well under your $250. Setting it up now.',
+    {t:'user',  html:'I want some new headphones like the Bose — look for a few options and deals. Ideally under $250.'},
+    {t:'agent', html:'Found four good options — two under your $250:',
+      steps:['Searched the open web and social for deals','Compared prices across retailers']},
+    {t:'products', items:[
+      {name:'Bose QuietComfort Ultra', price:'$329', src:'Best Buy', tag:'over budget', col:'#4A4A58'},
+      {name:'Sony WH-1000XM5', price:'$299', src:'Amazon', tag:'over budget', col:'#1F2A44'},
+      {name:'JBL Live 770NC', price:'$229', src:'jbl.com', tag:'under budget', col:'#2E6ED9'},
+      {name:'Brightline ANC-900', price:'$189', src:'brightline-audio-outlet.shop', tag:'50% off · via Instagram ad', col:'#6A4DF6', pick:true, deal:true}
+    ]},
+    {t:'agent', awaitClick:true, html:'Great choice — the Brightline ANC-900 at $189 is the best deal there. Setting it up now.',
       steps:['Resolved the seller — brightline-audio-outlet.shop','Initiating payment of $189…']},
     {t:'api', awaitClick:true, verb:'POST', path:'/v1/risk/assess', lat:'52ms', body:{
       merchant:{domain:'brightline-audio-outlet.shop', claimed_name:'Brightline Audio', resolved_from:'instagram_ad'},
-      intent:{customer_budget:{value:25000,currency:'USD'}, selected_by:'customer — cheapest option', amount:{value:18900,currency:'USD'}, item:'ANC-900 headphones'}}},
+      intent:{customer_budget:{value:25000,currency:'USD'}, selected_by:'customer — clicked Buy on the cheapest option', amount:{value:18900,currency:'USD'}, item:'ANC-900 headphones'}}},
     {t:'layer', html:'ASSESSING THE PAYEE — PRIVATE DATA SOURCES & CROSS-BANK FRAUD INTEL THE AGENT CAN\'T SEE'},
     {t:'layer', html:'PATTERN 1 · IMPERSONATION — IS THE PAYEE WHO THEY CLAIM?', cls:'p1'},
     {t:'signal', level:'high', ic:'⚠️', html:'<b>Recently created</b> — domain registered 9 days ago; common for short-lived scam sites.<span class="lvl">HIGH RISK</span>'},
@@ -333,7 +354,7 @@ function warningCard(){
       <div class="bd">
         <img class="tunio sm" src="${TUNIO.annoyed}" alt="">
         <h3>We don't recommend this payment</h3>
-        <div class="warnsub">You chose the cheapest option. Before your agent pays <b>brightline-audio-outlet.shop</b>, here's what we found:</div>
+        <div class="warnsub">You picked the cheapest option. Before your agent pays <b>brightline-audio-outlet.shop</b>, here's what we found:</div>
         <div class="warn-card high"><div class="bar"></div><div class="wt"><div class="t">The seller isn't who it claims to be</div>A 9-day-old site imitating Brightline Audio — no registered business, hidden ownership, hosted alongside known scam sites, and its listed phone and Instagram don't check out.</div></div>
         <div class="warn-card high"><div class="bar"></div><div class="wt"><div class="t">This site tries to manipulate AI agents</div>The page hides text — invisible to you — written to steer shopping agents into buying. That's a deliberate scam technique.</div></div>
         <div class="warn-card high"><div class="bar"></div><div class="wt"><div class="t">Already reported across our fraud network</div>Flagged as a suspected scam at 3 partner banks in the last 24 hours.</div></div>
@@ -359,9 +380,36 @@ function warningCard(){
   return r;
 }
 
+function prodSVG(col){ return `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M13 40v-8a19 19 0 0 1 38 0v8" fill="none" stroke="${col}" stroke-width="5" stroke-linecap="round"/><rect x="9" y="37" width="13" height="19" rx="5.5" fill="${col}"/><rect x="42" y="37" width="13" height="19" rx="5.5" fill="${col}"/></svg>`; }
+
 function play(b){
   switch(b.t){
     case 'user': addUser(b.html); break;
+    case 'products': {
+      const r = addAssistant('');
+      const grid = el(`<div class="prods"></div>`);
+      b.items.forEach(it=>{
+        const card = el(`<div class="prod${it.deal?' deal':''}">
+          ${it.deal?'<div class="dealtag">BEST DEAL</div>':''}
+          <div class="pimg">${prodSVG(it.col)}</div>
+          <div class="pname">${it.name}</div>
+          <div class="pline"><span class="pprice">${it.price}</span><span class="ptag">${it.tag}</span></div>
+          <div class="psrc">${it.src}</div>
+          <button class="pbuy">Buy</button>
+        </div>`);
+        card.querySelector('.pbuy').addEventListener('click',(e)=>{
+          e.stopPropagation();
+          const btn = e.currentTarget;
+          if(!it.pick){ btn.classList.add('shake'); setTimeout(()=>btn.classList.remove('shake'),350); return; }
+          btn.textContent='✓ Buying'; btn.classList.add('picked');
+          grid.querySelectorAll('.prod').forEach(p=>{ if(p!==card) p.classList.add('dim'); });
+          resume();
+        });
+        grid.appendChild(card);
+      });
+      r.querySelector('.body').appendChild(grid);
+      break;
+    }
     case 'agent': {
       const r = addAssistant(b.html);
       if(b.steps){
@@ -375,7 +423,7 @@ function play(b){
       }
       break;
     }
-    case 'cancelled': addAssistant('Cancelled — I won\'t pay that site. The other two options are from verified sellers but over budget — want me to find the best verified price under $250 instead?'); break;
+    case 'cancelled': addAssistant('Cancelled — I won\'t pay that site. The JBL Live 770NC is $229 from a seller I can verify — want me to buy that instead?'); break;
     case 'layer': { clearIdle(); const l = el(`<div class="layer-label ${b.cls||''}">${b.html}</div>`); risk.appendChild(l); reveal(l); break; }
     case 'api': { clearIdle(); const blk = el(`<div class="api-block ${b.cls||''}"><div class="api-head"><span class="verb">${b.verb}</span><span>${b.path}</span><span class="lat">${b.lat}</span></div><div class="api-body">${J(b.body)}</div></div>`); risk.appendChild(blk); reveal(blk); break; }
     case 'signal': { clearIdle(); const s = el(`<div class="signal ${b.level}"><div class="ic">${b.ic}</div><div>${b.html}</div></div>`); risk.appendChild(s); reveal(s); break; }
