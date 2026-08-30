@@ -78,7 +78,7 @@
   .gpt-head .ava{width:26px;height:26px;border-radius:50%;background:var(--gpt-ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px}
   .gpt-head h2{font-size:16px;font-weight:600;color:var(--gpt-ink)}
   .gpt-head .sub{font-size:12.5px;color:var(--gpt-grey);margin-left:auto}
-  .chat{flex:1;overflow-y:auto;padding:24px 0;zoom:.82}
+  .chat{flex:1;overflow-y:auto;padding:24px 0;zoom:.8}
   .chat-inner{max-width:680px;margin:0 auto;padding:0 26px;display:flex;flex-direction:column;gap:22px}
   .chat-inner > *{flex-shrink:0}
 
@@ -415,6 +415,8 @@ function warningCard(){
       </div>
     </div>`);
   r.querySelector('.body').appendChild(card);
+  // one-time nudge so the whole warning is on screen (not continuous auto-scroll)
+  setTimeout(()=>{ chat.scrollTop = chat.scrollHeight; }, 450);
   card.querySelectorAll('[data-action]').forEach(btn=>{
     btn.addEventListener('click', (e)=>{
       e.stopPropagation();
