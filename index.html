@@ -174,6 +174,9 @@
   .finding{background:rgba(250,250,250,.05);border-left:3px solid var(--risk-med);border-radius:10px;padding:12px 14px;opacity:0;transform:translateX(10px);transition:opacity .3s,transform .3s}
   .finding.show{opacity:1;transform:none}
   .finding.high{border-left-color:var(--risk-high)}
+  .finding.ok{border-left-color:var(--ok)}
+  .f-chip.ok{background:rgba(46,158,107,.16);color:#7BD8AC}
+  .f-sub.ok .sdot{color:var(--ok)} .f-sub.ok .schip{color:#7BD8AC}
   .f-head{display:flex;align-items:center;gap:10px}
   .f-head .ic{font-size:15px}
   .f-title{font-weight:600;font-size:14px;color:var(--seasalt);flex:1}
@@ -272,17 +275,25 @@ const SCENES = {
     {t:'api', awaitClick:true, verb:'POST', path:'/v1/risk/assess', lat:'44ms', body:{
       merchant:{domain:'freshfields.com', claimed_country:'US'},
       intent:{customer_rule:'weekly shop, under $60', amount:{value:5840,currency:'USD'}}}},
-    {t:'api', verb:'200', path:'response · Tunic Pay → the bank', lat:'', body:{
+    {t:'layer', with:true, html:'ASSESSING THE PAYEE — PRIVATE DATA SOURCES & CROSS-BANK FRAUD INTEL THE AGENT CAN\'T SEE'},
+    /* space → the response + all trust findings */
+    {t:'api', awaitClick:true, verb:'200', path:'response · Tunic Pay → the bank', lat:'', body:{
       risk_score:0.04, confidence:0.96,
-      green_flags:['established_domain','registry_match','verified_contact_details','clean_consortium_record'],
+      findings:['verified_business_identity','no_scam_pattern_indicators','clean_fraud_intel_record'],
       rationale:'++Domain 12 years old, legal entity verified and active, contact details corroborated, no negative signals in the cross-bank network.',
       recommended_action:'++proceed'}},
-    {t:'layer', html:'THE EVIDENCE BEHIND THAT SCORE — TRUST SIGNALS'},
-    {t:'signal', level:'okay', ic:'✓', html:'<b>Established domain</b> — registered 12 years ago, consistent hosting history.<span class="lvl">GREEN FLAG</span>'},
-    {t:'signal', level:'okay', ic:'✓', html:'<b>Registered business match</b> — active state-registry record (via OpenCorporates) matching the site\'s legal entity.<span class="lvl">GREEN FLAG</span>'},
-    {t:'signal', level:'okay', ic:'✓', html:'<b>Verified contact details</b> — the site\'s phone and email resolve to the registered business.<span class="lvl">GREEN FLAG</span>'},
-    {t:'signal', level:'okay', ic:'✓', html:'<b>Clean network record</b> — no reports across Tunic Pay\'s cross-bank consortium.<span class="lvl">GREEN FLAG</span>'},
-    {t:'decision', kind:'proceed', verdict:'PROCEED', why:'Risk 0.04, confidence 0.96. The bank clears it with zero added friction — the customer never sees us.'},
+    {t:'layer', with:true, html:'THE EVIDENCE BEHIND THAT SCORE — TRUST SIGNALS'},
+    {t:'finding', with:true, level:'ok', ic:'🏢', title:'Verified business identity', subs:[
+      {lvl:'ok', tx:'Domain registered 12 years ago — consistent hosting history'},
+      {lvl:'ok', tx:'Active state-registry record matching the site\'s legal entity (via OpenCorporates)'},
+      {lvl:'ok', tx:'Phone and email on the site resolve to the registered business'}]},
+    {t:'finding', with:true, level:'ok', ic:'🌐', title:'No scam-pattern indicators', subs:[
+      {lvl:'ok', tx:'Clean hosting — no links to flagged domains or scam clusters'},
+      {lvl:'ok', tx:'Transparent ownership, established web and social presence'}]},
+    {t:'finding', with:true, level:'ok', ic:'🏦', title:'Clean Fraud Intelligence record', subs:[
+      {lvl:'ok', tx:'No reports across Tunic Pay\'s cross-bank network'},
+      {lvl:'info', tx:'Private cross-bank data — checked in real time on every agent payment'}]},
+    {t:'decision', with:true, kind:'proceed', verdict:'PROCEED', why:'Risk 0.04, confidence 0.96. The bank clears it with zero added friction — the customer never sees us.'},
     {t:'agent', html:'All done ✅ — $58.40 paid to FreshFields Market, everything checked out. Delivery tomorrow, 8–10am.'},
     {t:'outcome'}
   ],
@@ -472,8 +483,10 @@ function play(b){
     case 'api': { clearIdle(); const blk = el(`<div class="api-block ${b.cls||''}"><div class="api-head"><span class="verb">${b.verb}</span><span>${b.path}</span><span class="lat">${b.lat}</span></div><div class="api-body">${J(b.body)}</div></div>`); risk.appendChild(blk); reveal(blk); break; }
     case 'signal': { clearIdle(); const s = el(`<div class="signal ${b.level}"><div class="ic">${b.ic}</div><div>${b.html}</div></div>`); risk.appendChild(s); reveal(s); break; }
     case 'finding': { clearIdle();
-      const subs = (b.subs||[]).map(su=>`<div class="f-sub ${su.lvl}"><span class="sdot">●</span><span class="stx">${su.tx}</span><span class="schip">${su.lvl==='high'?'HIGH':su.lvl==='med'?'MEDIUM':'INFO'}</span></div>`).join('');
-      const f = el(`<div class="finding ${b.level}"><div class="f-head"><span class="ic">${b.ic}</span><span class="f-title">${b.title}</span><span class="f-chip ${b.level}">${b.level==='high'?'HIGH RISK':'MEDIUM RISK'}</span></div><div class="f-subs">${subs}</div></div>`);
+      const SUBLBL = {high:'HIGH', med:'MEDIUM', ok:'CLEAR', info:'INFO'};
+      const CHIPLBL = {high:'HIGH RISK', med:'MEDIUM RISK', ok:'VERIFIED'};
+      const subs = (b.subs||[]).map(su=>`<div class="f-sub ${su.lvl}"><span class="sdot">●</span><span class="stx">${su.tx}</span><span class="schip">${SUBLBL[su.lvl]||'INFO'}</span></div>`).join('');
+      const f = el(`<div class="finding ${b.level}"><div class="f-head"><span class="ic">${b.ic}</span><span class="f-title">${b.title}</span><span class="f-chip ${b.level}">${CHIPLBL[b.level]||''}</span></div><div class="f-subs">${subs}</div></div>`);
       risk.appendChild(f); reveal(f); break; }
     case 'decision': { clearIdle(); const d = el(`<div class="decision ${b.kind}"><div class="verdict">${b.verdict}</div><div class="why">${b.why}</div></div>`); risk.appendChild(d); reveal(d); break; }
     case 'card': warningCard(); break;
