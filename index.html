@@ -332,9 +332,9 @@ const SCENES = {
     /* space → the response + verdict */
     {t:'api', awaitClick:true, verb:'200', path:'response · Tunic Pay → the bank', lat:'', body:{
       risk_score:0.93, confidence:0.90,
-      patterns:['!!impersonation'],
-      findings:['likely_brand_impersonation','scam_pattern_indicators','fraud_intel_network_reports'],
-      rationale:'!!A 9-day-old storefront impersonating Brightline Audio — no legitimate business behind it, and already reported across the cross-bank network.',
+      patterns:['!!impersonation','!!agent_prompt_injection'],
+      findings:['likely_brand_impersonation','scam_pattern_indicators','fraud_intel_network_reports','hidden_agent_directed_text'],
+      rationale:'!!A 9-day-old storefront impersonating Brightline Audio, already reported across the cross-bank network — and its page carries hidden text engineered to manipulate visiting AI agents.',
       recommended_action:'!!warn customer — advise cancel',
       note:'step-up available (chat with the agent for more) — not needed at this confidence'}},
     {t:'decision', with:true, kind:'warn', verdict:'DO NOT RECOMMEND', why:'Risk 0.93 at confidence 0.90. Confident from the domain alone — no step-up needed. Tunic Pay hands the bank the decision; the bank pushes the warning into the customer\'s agent chat.'},
@@ -343,12 +343,12 @@ const SCENES = {
     {t:'layer', html:'AFTER CANCELLATION — WHAT WE SEND ONWARD'},
     {t:'api', verb:'POST', path:'/v1/schemes/alerts · to the scheme', lat:'', cls:'scheme', body:{
       recipient:'scheme_network_operations',
-      subject:{merchant_domain:'brightline-audio-outlet.shop', patterns:['!!impersonation']},
+      subject:{merchant_domain:'brightline-audio-outlet.shop', patterns:['!!impersonation','!!agent_prompt_injection']},
       evidence:['risk_assessment','registry_checks','hosting_cluster','consortium_reports'],
       request:'!!flag merchant across agentic rails'}},
     {t:'api', verb:'ADD', path:'tunic-pay intelligence network', lat:'', cls:'network', body:{
       entity:'brightline-audio-outlet.shop',
-      typology:'purchase_scam · lookalike storefront',
+      typology:'purchase_scam · lookalike storefront · agent prompt-injection',
       shared_with:'++all member institutions',
       effect:'++the next customer, at any bank, is protected before they ever see this site'}},
     {t:'outcome'}
@@ -391,6 +391,7 @@ function warningCard(){
         <h3>We don't recommend this payment</h3>
         <div class="warnsub">You picked the cheapest option. Before your agent pays <b>brightline-audio-outlet.shop</b>, here's what we found:</div>
         <div class="warn-card high"><div class="bar"></div><div class="wt"><div class="t">The seller isn't who it claims to be</div>A 9-day-old site imitating Brightline Audio — no registered business, hidden ownership, hosted alongside known scam sites, and its listed phone and Instagram don't check out.</div></div>
+        <div class="warn-card high"><div class="bar"></div><div class="wt"><div class="t">This site tries to manipulate AI agents</div>The page hides text — invisible to you — written to steer shopping agents into buying. That's a deliberate scam technique.</div></div>
         <div class="warn-card high"><div class="bar"></div><div class="wt"><div class="t">Already reported across our fraud network</div>Flagged as a suspected scam at 3 partner banks in the last 24 hours.</div></div>
         <div class="verdict-line">We don't recommend paying this seller.</div>
         <div class="warn-btns">
